@@ -1,3 +1,5 @@
+name: Notify Main Repo on Submodule Update
+
 on:
   push:
     branches:
