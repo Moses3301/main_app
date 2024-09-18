@@ -1,0 +1,17 @@
+name: Notify Main Repo on Submodule Update
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  notify-main-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send repository dispatch to Main Repo
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          repository: Moses3301/other_app.git
+          event-type: submodule_updated
+          token: ${{ secrets.GITHUB_TOKEN }}
+          client-payload: '{"submodule_branch": "${{ github.ref_name }}"}'
