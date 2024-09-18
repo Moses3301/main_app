@@ -13,5 +13,5 @@ jobs:
         with:
           repository: Moses3301/other_app.git
           event-type: submodule_updated
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           client-payload: '{"submodule_branch": "${{ github.ref_name }}"}'
