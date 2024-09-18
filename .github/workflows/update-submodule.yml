@@ -14,7 +14,7 @@ jobs:
       - name: Send repository dispatch to Main Repo
         uses: peter-evans/repository-dispatch@v2
         with:
-          repository: your-username/balena-project-repo  # Replace with your main repo
+          repository: Moses3301/other_app  # Replace with your main repo
           event-type: submodule_updated
           token: ${{ secrets.PAT }}
           client-payload: '{"submodule_branch": "${{ github.ref_name }}"}'
