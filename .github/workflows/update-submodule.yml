@@ -1,0 +1,32 @@
+on:
+  repository_dispatch:
+    types: [submodule_updated]
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Main Repository
+        uses: actions/checkout@v3
+        with:
+          ref: "${{ github.event.client_payload.submodule_branch }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: recursive
+          persist-credentials: false  # Important for security
+
+      - name: Set up Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update Submodules to Latest Commit on Default Branch
+        run: |
+          git submodule update --remote --merge
+
+      - name: Commit and Push Changes
+        env:
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.PAT }}
+        run: |
+          git add .
+          git commit -m "Update submodule to latest commit"
+          git push https://$PERSONAL_ACCESS_TOKEN@github.com/your-username/balena-project-repo.git HEAD:${{ github.event.client_payload.submodule_branch }}
