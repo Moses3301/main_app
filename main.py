@@ -31,6 +31,7 @@ def remove_todo():
 # Main loop
 while True:
     #some commmnt
+    lolo
     print("\nTodo List Application")
     print("1. Display Todos")
     print("2. Add Todo")
