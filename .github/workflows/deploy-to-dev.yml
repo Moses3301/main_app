@@ -1,0 +1,60 @@
+name: Update the development devices
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+
+      - name: Setup balena CLI
+        uses: balena-io-examples/setup-balena-action@main
+        with:
+          balena-token: ${{ secrets.BALENA_API_TOKEN }}
+
+      - name: Push to balenaCloud
+        id: get_release
+        run: |
+          echo 'pushing draft...'
+          output=$(balena push ${{ secrets.BALENA_APP_NAME }} --draft)
+          echo 'done pushing draft'
+          echo $output
+          id=$(echo $output | grep -oP '(?<=id:) \K[0-9a-f]+')
+          commit=$(echo $output | grep -oP '(?<=Release:) \K[0-9a-f\S]+')
+          echo "::set-output name=RELEASE_ID::$id"
+          echo "::set-output name=RELEASE_COMMIT::$commit"
+
+      - name: Updating QA group
+        run: |
+          TARGET_TAG_KEY=device-type
+          TARGET_TAG_VALUE=dev
+          COMMIT_HASH=${{ steps.get_release.outputs.RELEASE_COMMIT }}
+          RELEASE_ID=${{ steps.get_release.outputs.RELEASE_ID }}
+          authToken=${{ secrets.BALENA_API_TOKEN }}
+          BASE_URL=${{ secrets.BALENA_BASE_URL }}
+          APP_ID=${{ secrets.APP_ID }}
+          VALUE_QUERY="%20and%20((value)%20eq%20(%27$TARGET_TAG_VALUE%27))"
+
+          echo "Setting all devices with tag $TARGET_TAG_KEY and value $TARGET_TAG_VALUE to commit $COMMIT_HASH with release = $RELEASE_ID"
+
+          curl -X PATCH -H "authorization: Bearer $authToken"\
+            -H "Content-Type: application/json" \
+            --data-binary '{"should_be_running__release":'$RELEASE_ID'}' \
+            "https://api.$BASE_URL/v6/device?\$filter=((belongs_to__application%20eq%20$APP_ID)%20and%20(device_tag/any(dt:(((tag_key)%20eq%20(%27$TARGET_TAG_KEY%27))$VALUE_QUERY))))"
+
+      - name: Print completion message
+        run: |
+          echo "A draft release ${{ steps.get_release.outputs.RELEASE_ID }} has been created on Balena. and pushed to dev"

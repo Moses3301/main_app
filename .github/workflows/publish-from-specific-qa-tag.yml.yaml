@@ -1,0 +1,60 @@
+name: Publish Release from Specific QA Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      qa_tag:
+        description: 'QA tag to publish (e.g., qa-20230501123456)'
+        required: true
+
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Validate QA tag
+        id: validate_tag
+        run: |
+          QA_TAG=${{ github.event.inputs.qa_tag }}
+          if ! git rev-parse "$QA_TAG" >/dev/null 2>&1; then
+            echo "Error: The specified QA tag '$QA_TAG' does not exist."
+            exit 1
+          fi
+          echo "QA_TAG=${QA_TAG}" >> $GITHUB_OUTPUT
+          echo "Valid QA tag: ${QA_TAG}"
+
+      - name: Generate release version
+        id: generate_version
+        run: |
+          QA_TAG=${{ steps.validate_tag.outputs.QA_TAG }}
+          RELEASE_VERSION="v${QA_TAG#qa-}"
+          echo "RELEASE_VERSION=${RELEASE_VERSION}" >> $GITHUB_OUTPUT
+          echo "Release version: ${RELEASE_VERSION}"
+
+      - name: Create and push release tag
+        run: |
+          RELEASE_TAG=${{ steps.generate_version.outputs.RELEASE_VERSION }}
+          QA_TAG=${{ steps.validate_tag.outputs.QA_TAG }}
+          echo "Creating release tag: $RELEASE_TAG"
+          git tag -a "$RELEASE_TAG" -m "Release $RELEASE_TAG" $QA_TAG
+          git push origin "$RELEASE_TAG"
+
+      - name: Setup balena CLI
+        uses: balena-io-examples/setup-balena-action@main
+        with:
+          balena-token: ${{ secrets.BALENA_API_TOKEN }}
+
+      - name: Create Balena Release
+        run: |
+          git checkout ${{ steps.generate_version.outputs.RELEASE_VERSION }}
+          balena push ${{ secrets.APP_ID_PRODUCTION }}
+          balena push ${{ secrets.APP_ID }}
+
+      - name: Print completion message
+        run: |
+          echo "Release ${{ steps.generate_version.outputs.RELEASE_VERSION }} has been created and published."
+          echo "Based on QA tag: ${{ steps.validate_tag.outputs.QA_TAG }}"
