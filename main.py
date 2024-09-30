@@ -30,7 +30,7 @@ def remove_todo():
 
 # Main loop
 while True:
-    
+    #some commmnt
     print("\nTodo List Application")
     print("1. Display Todos")
     print("2. Add Todo")
