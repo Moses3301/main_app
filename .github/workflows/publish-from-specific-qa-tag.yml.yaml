@@ -1,5 +1,8 @@
 name: Publish Release from Specific QA Tag
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
     inputs:
