@@ -27,6 +27,11 @@ jobs:
           echo "QA_TAG=${QA_TAG}" >> $GITHUB_OUTPUT
           echo "Valid QA tag: ${QA_TAG}"
 
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "github-actions-bot@users.noreply.github.com"
+
       - name: Generate release version
         id: generate_version
         run: |
