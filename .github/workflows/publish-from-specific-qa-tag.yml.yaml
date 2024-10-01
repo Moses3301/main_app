@@ -48,7 +48,7 @@ jobs:
           RELEASE_TAG=${{ steps.generate_version.outputs.RELEASE_VERSION }}
           QA_TAG=${{ steps.validate_tag.outputs.QA_TAG }}
           echo "Creating release tag: $RELEASE_TAG"
-          git tag -a "$RELEASE_TAG" -m "Release $RELEASE_TAG" $QA_TAG
+          git tag -a "$RELEASE_TAG" -m "Release $RELEASE_TAG"
           git push https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git "$RELEASE_TAG"
 
       - name: Setup balena CLI
