@@ -34,7 +34,7 @@ jobs:
           TAG_NAME=${{ steps.generate_tag.outputs.TAG_NAME }}
           echo "Creating tag: $TAG_NAME"
           git tag -a "$TAG_NAME" -m "QA Release $TAG_NAME"
-          git push origin "$TAG_NAME"
+          git push https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git "$TAG_NAME"
 
       - name: Setup balena CLI
         uses: balena-io-examples/setup-balena-action@main
