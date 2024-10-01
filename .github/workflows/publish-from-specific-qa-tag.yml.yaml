@@ -47,6 +47,7 @@ jobs:
         run: |
           RELEASE_TAG=${{ steps.generate_version.outputs.RELEASE_VERSION }}
           QA_TAG=${{ steps.validate_tag.outputs.QA_TAG }}
+          git checkout $QA_TAG
           echo "Creating release tag: $RELEASE_TAG"
           git tag -a "$RELEASE_TAG" -m "Release $RELEASE_TAG"
           git push origin "$RELEASE_TAG"
@@ -58,7 +59,6 @@ jobs:
 
       - name: Create Balena Release
         run: |
-          git checkout ${{ steps.generate_version.outputs.RELEASE_VERSION }}
           balena push ${{ secrets.APP_ID_PRODUCTION }}
           balena push ${{ secrets.APP_ID }}
 
