@@ -29,12 +29,12 @@ jobs:
           TIMESTAMP=$(date +'%Y%m%d%H%M%S')
           echo "TAG_NAME=qa-${TIMESTAMP}" >> $GITHUB_OUTPUT
 
-      - uses: rickstaa/action-create-tag@v1
-        id: "tag_create"
-        with:
-          tag: ${{ steps.generate_tag.outputs.TAG_NAME }}
-          tag_exists_error: false
-          message: "QA Release $TAG_NAME"
+      - name: Create and push QA tag
+        run: |
+          TAG_NAME=${{ steps.generate_tag.outputs.TAG_NAME }}
+          echo "Creating tag: $TAG_NAME"
+          git tag -a "$TAG_NAME" -m "QA Release $TAG_NAME"
+          git push https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git "$TAG_NAME"
 
       - name: Setup balena CLI
         uses: balena-io-examples/setup-balena-action@main
