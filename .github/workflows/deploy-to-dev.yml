@@ -32,7 +32,7 @@ jobs:
           output=$(balena push ${{ secrets.BALENA_APP_NAME }} --draft)
           echo 'done pushing draft'
           echo $output
-          commit=$(echo $output | grep  | grep -oP '(?<=Release:) \K[0-9a-f\S]+')
+          commit=$(echo $output | grep -oP '(?<=Release:) \K[0-9a-f\S]+')
           id=$(echo $output | grep $commit | grep -oP '(?<=id:) \K[0-9a-f]+')
           echo "RELEASE_ID=${id}" >> $GITHUB_OUTPUT
           echo "RELEASE_COMMIT=${commit}" >> $GITHUB_OUTPUT
