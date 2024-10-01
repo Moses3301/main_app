@@ -90,4 +90,4 @@ jobs:
           echo "QA tag ${{ steps.generate_tag.outputs.TAG_NAME }} has been created and pushed."
           echo "A draft release ${{ steps.get_release.outputs.RELEASE_ID }} has been created on Balena."
           echo "To push to production use the Tag name:"
-          echo "${{ steps.get_release.outputs.TAG_NAME }}"
+          echo "${{ steps.generate_tag.outputs.TAG_NAME }}"
