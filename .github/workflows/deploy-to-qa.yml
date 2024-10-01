@@ -42,11 +42,22 @@ jobs:
           echo 'pushing draft...'
           output=$(balena push ${{ secrets.BALENA_APP_NAME }} --draft)
           echo 'done pushing draft'
-          echo $output
-          id=$(echo $output | grep -oP '(?<=id:) \K[0-9a-f]+')
-          commit=$(echo $output | grep -oP '(?<=Release:) \K[0-9a-f\S]+')
-          echo "::set-output name=RELEASE_ID::$id"
-          echo "::set-output name=RELEASE_COMMIT::$commit"
+          echo "$output"
+          
+          # Extract the release line
+          release_line=$(echo "$output" | grep "Release:")
+          echo "Release line: $release_line"
+          
+          # Extract commit and id
+          commit=$(echo "$release_line" | grep -oP '(?<=Release: )[0-9a-f]+' | head -n1)
+          id=$(echo "$release_line" | sed 's/\x1B\[[0-9;]*[mGK]//g' | grep -oP '(?<=id: )[0-9]+')
+          
+          echo "Extracted commit: $commit"
+          echo "Extracted id: $id"
+          
+          # Set outputs
+          echo "RELEASE_ID=$id" >> $GITHUB_OUTPUT
+          echo "RELEASE_COMMIT=$commit" >> $GITHUB_OUTPUT
 
       - name: Updating QA group
         run: |

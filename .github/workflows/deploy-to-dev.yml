@@ -60,7 +60,6 @@ jobs:
           VALUE_QUERY="%20and%20((value)%20eq%20(%27$TARGET_TAG_VALUE%27))"
 
           echo "Setting all devices with tag $TARGET_TAG_KEY and value $TARGET_TAG_VALUE to commit $COMMIT_HASH with release = $RELEASE_ID"
-          echo "https://api.$BASE_URL/v6/device?\$filter=((belongs_to__application%20eq%20$APP_ID)%20and%20(device_tag/any(dt:(((tag_key)%20eq%20(%27$TARGET_TAG_KEY%27))$VALUE_QUERY))))"
           curl -X PATCH -H "authorization: Bearer $authToken"\
             -H "Content-Type: application/json" \
             --data-binary '{"should_be_running__release":'$RELEASE_ID'}' \
