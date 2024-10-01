@@ -34,8 +34,8 @@ jobs:
           echo $output
           id=$(echo $output | grep -oP '(?<=id:) \K[0-9a-f]+')
           commit=$(echo $output | grep -oP '(?<=Release:) \K[0-9a-f\S]+')
-          echo "::set-output name=RELEASE_ID::$id"
-          echo "::set-output name=RELEASE_COMMIT::$commit"
+          echo "RELEASE_ID=qa-${id}" >> $GITHUB_OUTPUT
+          echo "RELEASE_COMMIT=qa-${commit}" >> $GITHUB_OUTPUT
 
       - name: Updating dev group
         run: |
