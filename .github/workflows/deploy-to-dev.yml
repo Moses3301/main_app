@@ -34,7 +34,7 @@ jobs:
           echo $output
           line=$(echo $output | grep -P '(?<=Release:)')
           commit=$(echo $line | grep -oP '(?<=Release:) \K[0-9a-f\S]+')
-          id=$(echo "$line" | sed 's/\x1B\[[0-9;]*[mGK]//g' | grep -oP '(?<=id:) \K[0-9a-f]+')
+          id=$(echo $line | sed 's/\x1B\[[0-9;]*[mGK]//g' | grep -oP '(?<=id:) \K[0-9a-f]+')
           echo "RELEASE_ID=${id}" >> $GITHUB_OUTPUT
           echo "RELEASE_COMMIT=${commit}" >> $GITHUB_OUTPUT
 
